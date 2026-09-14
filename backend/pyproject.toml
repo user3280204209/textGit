@@ -1,0 +1,48 @@
+# 统一的代码规范与测试配置 —— 全组共用，不要在本地覆盖
+# 目的：让「格式」和「lint」不再是口头约定，而是可执行的一条命令
+
+[project]
+name = "learnagent-backend"
+version = "0.1.0"
+description = "个性化资源生成与学习多智能体系统 - 后端"
+requires-python = ">=3.13"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+exclude = [
+    ".venv",
+    "__pycache__",
+    "alembic/versions",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort（import 排序）
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501", # 行长由 formatter 处理，避免与 format 冲突
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+addopts = "-q --strict-markers"
+markers = [
+    "integration: 需要真实 LLM API Key 的测试（默认不在 CI 跑）",
+    "slow: 耗时较长的测试",
+]

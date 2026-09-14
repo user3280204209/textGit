@@ -1,0 +1,24 @@
+# 强制 Git 在仓库内统一用 LF，杜绝团队跨平台假 diff
+* text=auto eol=lf
+
+# Windows 专属脚本保留 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# 二进制文件不做行尾转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.mp4 binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.zip binary
+
+# 锁文件不参与语言统计、冲突时视为生成物
+pnpm-lock.yaml linguist-generated=true
+*.lock.txt linguist-generated=true

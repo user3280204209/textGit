@@ -1,12 +1,59 @@
-# OS
+# ===== 密钥：绝不提交 =====
+.env
+.env.*
+!.env.example
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.python-version
+
+# 测试与工具缓存
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ===== Node / 前端 =====
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+.eslintcache
+# TypeScript 增量构建信息（tsc -b 生成，绝不能入库）
+*.tsbuildinfo
+
+# ===== 运行时产物：不入库 =====
+# 生成的资源（文档/图片/视频/思维导图）体积大且可重生成
+storage/
+uploads/
+data/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+logs/
+
+# 本地模型权重（纯 API 方案下不应出现；若有人误放，禁止入库）
+models/
+*.gguf
+*.safetensors
+*.bin
+
+# ===== 编辑器 / 系统 =====
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 .DS_Store
 Thumbs.db
-
-# Editor
-.vscode/
-.idea/
-
-# Build
-dist/
-build/
-node_modules/
+desktop.ini
