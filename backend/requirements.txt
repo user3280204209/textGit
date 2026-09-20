@@ -1,0 +1,54 @@
+# ============================================================
+# 后端直接依赖 —— 唯一真相源（single source of truth）
+# ============================================================
+# 改这个文件 = 全组都要同步。禁止私自 pip install 别的包。
+#
+# 版本策略：写「下限 + 主版本上限」，不写死精确版本。
+#   - 写死版本（==）会导致不同系统上找不到匹配 wheel
+#   - 完全不写会导致组员之间装出不同版本
+#   - 真正的精确锁定由 requirements.lock.txt 负责（生成后提交）
+#
+# 环境要求：Python 3.13（本项目刻意避开 torch / faiss 等
+# 在 3.13 上尚无稳定 wheel 的本地推理依赖，全部走 API）
+# ============================================================
+
+# ---- Web 框架 ----
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.32,<1.0
+python-multipart>=0.0.12          # 文件上传（学习资料上传）
+sse-starlette>=2.1,<3.0           # 对话式画像 / 生成进度流式推送
+
+# ---- 配置与校验 ----
+pydantic>=2.9,<3.0
+pydantic-settings>=2.6,<3.0
+python-dotenv>=1.0,<2.0
+
+# ---- 多智能体编排（核心）----
+# langgraph 负责状态机式的多智能体协作；langchain 提供 LLM/Tool 抽象
+langgraph>=1.2,<2.0
+langchain>=1.3,<2.0
+langchain-core>=1.6,<2.0
+# 用 OpenAI 兼容协议统一接入 DeepSeek / 通义 / OpenAI 等
+langchain-openai>=1.6,<2.0
+openai>=2.45,<3.0
+
+# ---- 存储 ----
+SQLAlchemy>=2.0,<3.0
+alembic>=1.14,<2.0
+aiosqlite>=0.20,<1.0             # 开发期异步 SQLite；答辩换 PostgreSQL 时只改 DSN
+
+# ---- 资源生成（≥5 类，纯 API / 纯 Python，无重编译依赖）----
+jinja2>=3.1,<4.0                 # 文档 / 讲解材料模板渲染
+python-docx>=1.1,<2.0            # 专业课程讲解文档 .docx
+python-pptx>=1.0,<2.0            # 拓展阅读 / 讲义 .pptx
+markdown>=3.7,<4.0               # Markdown → HTML（思维导图与文档预览）
+
+# ---- HTTP 与工具 ----
+httpx>=0.28,<1.0
+tenacity>=9.0,<10.0              # LLM 调用重试（限流必备）
+orjson>=3.10,<4.0
+
+# ---- 开发与质量（每人都要装）----
+pytest>=8.3,<9.0
+pytest-asyncio>=0.24,<1.0
+ruff>=0.8,<1.0
