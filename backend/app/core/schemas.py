@@ -129,6 +129,38 @@ class ChatMessage(BaseModel):
     content: str
 
 
+class ChatUsage(BaseModel):
+    """token 用量。只用于展示"这次花了多少"，不参与业务判断。"""
+
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
+
+
+class ChatRequest(BaseModel):
+    """直连对话请求（滚雪球模式）。
+
+    关键设计：前端每次把**完整**的 messages 发过来，而不是只发最新一句。
+      - 好处：后端完全无状态，重启不丢上下文，逻辑一眼看得懂；
+      - 代价：对话一长，请求体变大（后面第 3 步再做"只发最近 N 轮"的裁剪）。
+
+    这条链路刻意不复用 ProfileChatRequest：那个是"抽画像"的，
+    这个是"聊天"的，职责不同就别硬塞进同一个模型。
+    """
+
+    messages: list[ChatMessage] = Field(min_length=1, description="完整对话历史")
+    student_id: str = Field(default="demo-student", description="会话归属，第 2 步接存储时真正用上")
+    temperature: float | None = Field(
+        default=None, ge=0.0, le=2.0, description="留空则用 .env 里的 LLM_TEMPERATURE"
+    )
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    model: str = Field(description="实际使用的模型名，便于排查'换没换成功'")
+    usage: ChatUsage = Field(default_factory=ChatUsage)
+
+
 class ProfileChatRequest(BaseModel):
     student_id: str
     messages: list[ChatMessage]
