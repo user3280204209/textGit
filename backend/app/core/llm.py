@@ -4,6 +4,15 @@
 1. 换供应商（DeepSeek → 通义 → OpenAI）只改 .env，业务代码不动；
 2. 统一加上重试与超时，避免每个 agent 各写一遍；
 3. 没有 Key 时抛出明确错误，而不是让调用方收到难懂的 SDK 报错。
+
+这里提供两个入口，读的是同一份 settings（也就是同一个 .env）：
+
+    get_llm()            →  LangChain 包装版，给 agents/ 、graph/ 的多智能体用
+    get_async_client()   →  原生 openai 客户端，给 api/chat.py 的直连对话用
+
+为什么要有第二个？因为"client.chat.completions.create(...)"这种写法
+不需要理解 LangChain 的任何概念，出问题也只看一层。
+两条通道并存不冲突：简单对话走直连，复杂编排走 LangGraph。
 """
 
 from __future__ import annotations
@@ -12,6 +21,7 @@ import logging
 from functools import lru_cache
 
 from langchain_openai import ChatOpenAI
+from openai import AsyncOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.core.config import settings
@@ -38,6 +48,27 @@ def get_llm(temperature: float | None = None) -> ChatOpenAI:
         api_key=settings.llm_api_key,
         base_url=settings.llm_base_url,
         temperature=settings.llm_temperature if temperature is None else temperature,
+        timeout=settings.agent_timeout_seconds,
+        max_retries=2,
+    )
+
+
+@lru_cache
+def get_async_client() -> AsyncOpenAI:
+    """返回原生 OpenAI 异步客户端，写法与日常脚本完全一致。
+
+        client = get_async_client()
+        response = await client.chat.completions.create(model=..., messages=...)
+
+    重试交给 SDK 自己（max_retries），所以这里不套 tenacity：
+    简单通道就该保持简单，排查问题时少一层要怀疑的东西。
+    """
+    if not settings.llm_configured:
+        raise LLMNotConfiguredError("未检测到 LLM_API_KEY。请在 backend/.env 中填写后再调用模型。")
+
+    return AsyncOpenAI(
+        api_key=settings.llm_api_key,
+        base_url=settings.llm_base_url,
         timeout=settings.agent_timeout_seconds,
         max_retries=2,
     )
