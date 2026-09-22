@@ -8,8 +8,9 @@
   --color-success: #3ecf8e;
   --color-warn: #f5a524;
   --color-danger: #f31260;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
-    "PingFang SC", sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC",
+    sans-serif;
   line-height: 1.6;
 }
 
@@ -80,4 +81,241 @@ a {
 .badge.err {
   color: var(--color-danger);
   border-color: var(--color-danger);
+}
+
+/* ============================================================
+   应用外壳 + 顶部导航
+   ============================================================ */
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.nav {
+  flex: none;
+  display: flex;
+  gap: 4px;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.nav__link {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.nav__link:hover {
+  color: var(--color-text);
+}
+
+.nav__link--active {
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+/*
+  这三个属性是"内部滚动"的关键组合，值得记一下：
+    flex: 1        让它吃掉剩余高度
+    min-height: 0  否则 flex 子项的最小高度是内容高度，会被内容撑破、不出滚动条
+    overflow-y     真正滚动的那一层
+  少写 min-height: 0 是新手最常踩的坑。
+*/
+.shell__main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   对话页
+   ============================================================ */
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.chat__header {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.chat__title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.chat__stats {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+
+.chat__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 0;
+}
+
+.chat__empty {
+  padding: 48px 0;
+  text-align: center;
+}
+
+.chat__empty p {
+  margin: 6px 0;
+}
+
+.chat__typing {
+  padding: 8px 0;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.chat__error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-danger);
+  border-radius: 10px;
+  background: rgba(243, 18, 96, 0.08);
+  font-size: 14px;
+}
+
+.chat__error-text {
+  color: var(--color-danger);
+}
+
+/* ============================================================
+   消息气泡
+   ============================================================ */
+.bubble-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.bubble-row--user {
+  align-items: flex-end;
+}
+
+.bubble-row--assistant {
+  align-items: flex-start;
+}
+
+.bubble-row__role {
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.bubble {
+  max-width: 78%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  font-size: 15px;
+  /* 保留模型输出里的换行与缩进 —— 不加这行，多行回答会挤成一行 */
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.bubble--user {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+/* ============================================================
+   输入区
+   ============================================================ */
+.composer {
+  flex: none;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  padding: 12px 0 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.composer__input {
+  flex: 1;
+  resize: none;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.composer__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.composer__input:disabled {
+  opacity: 0.6;
+}
+
+.composer__send {
+  flex: none;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.composer__send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   通用小按钮
+   ============================================================ */
+.btn-ghost {
+  flex: none;
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--color-text);
+  border-color: var(--color-muted);
+}
+
+.btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
