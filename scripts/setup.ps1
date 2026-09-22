@@ -127,6 +127,15 @@ if (-not (Test-Path $reqFile)) {
 }
 
 Write-Host "  正在安装（首次约需 2-5 分钟，取决于网速）..."
+
+# ⚠️ 中文 Windows 上必加这一行。
+# requirements.txt 是 UTF-8 编码且含中文注释，而 pip 用系统区域编码
+# （简体中文 Windows = GBK）去读它，会直接抛：
+#     UnicodeDecodeError: 'gbk' codec can't decode byte 0xab
+# 开启 Python 的 UTF-8 模式后，locale.getpreferredencoding() 返回 utf-8，
+# 该问题根治。少了这一行，每个中文 Windows 组员都会卡在这一步。
+$env:PYTHONUTF8 = "1"
+
 & conda run -n $EnvName --no-capture-output python -m pip install --upgrade pip
 & conda run -n $EnvName --no-capture-output python -m pip install -r $reqFile
 
@@ -136,6 +145,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "    - 网络超时：换国内镜像重试" -ForegroundColor Yellow
     Write-Host "      pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple" -ForegroundColor Yellow
     Write-Host "    - 编译报错：确认用的是 Python 3.13，不要用 3.14" -ForegroundColor Yellow
+    Write-Host "    - UnicodeDecodeError 'gbk'：先在当前窗口执行 `$env:PYTHONUTF8 = '1'` 再重试" -ForegroundColor Yellow
     exit 1
 }
 Write-Ok "后端依赖安装完成"
