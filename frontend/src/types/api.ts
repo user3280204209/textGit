@@ -73,6 +73,37 @@ export interface ProfileChatResponse {
 }
 
 // ============================================================
+// 直连对话（对应 backend/app/api/chat.py）
+// ============================================================
+// ⚠️ 必须与 backend/app/core/schemas.py 里的 ChatRequest / ChatResponse / ChatUsage 对齐。
+//
+// 注意这里没有"会话 id"的概念：因为后端**不存历史**，
+// 完整对话由前端那个 messages 数组携带（滚雪球）。
+
+/** token 用量。放在界面上是为了让"雪球越滚越贵"这件事看得见。 */
+export interface ChatUsage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+}
+
+export interface ChatRequest {
+  /** 完整对话历史。注意是"完整"，不是"最新一条"。 */
+  messages: ChatMessage[];
+  /** 会话归属，第 3 步接持久化时才真正用上 */
+  student_id?: string;
+  /** 留空则用后端 .env 里的 LLM_TEMPERATURE */
+  temperature?: number;
+}
+
+export interface ChatResponse {
+  reply: string;
+  /** 实际使用的模型名，用于确认"换没换成功" */
+  model: string;
+  usage: ChatUsage;
+}
+
+// ============================================================
 // 资源（需求点 2）
 // ============================================================
 export const RESOURCE_TYPES = [
@@ -95,12 +126,7 @@ export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
   code_case: "代码实操案例",
 };
 
-export type ResourceStatus =
-  | "pending"
-  | "running"
-  | "succeeded"
-  | "failed"
-  | "degraded";
+export type ResourceStatus = "pending" | "running" | "succeeded" | "failed" | "degraded";
 
 export const RESOURCE_STATUS_LABELS: Record<ResourceStatus, string> = {
   pending: "排队中",
