@@ -10,6 +10,8 @@
 
 import axios, { AxiosError } from "axios";
 import type {
+  ChatRequest,
+  ChatResponse,
   EnvCheckResponse,
   GenerateRequest,
   GenerateResponse,
@@ -98,6 +100,23 @@ export const api = {
 
   async resetProfile(studentId: string): Promise<void> {
     await client.delete(`/profile/${studentId}`);
+  },
+
+  // ---- 直连对话 ----
+  /**
+   * 发一轮对话。
+   *
+   * 注意签名：传进去的是**完整历史**（含本轮用户提问），不是单条消息。
+   * 后端无状态，它不知道也不关心你之前聊过什么。
+   *
+   * 超时单独放宽到 120 秒：默认的 60 秒对长回答偏紧，
+   * 而且这里一旦超时，用户只会看到"失败"，体验很差。
+   */
+  async chat(payload: ChatRequest): Promise<ChatResponse> {
+    const { data } = await client.post<ChatResponse>("/chat", payload, {
+      timeout: 120_000,
+    });
+    return data;
   },
 
   // ---- 资源生成 ----
